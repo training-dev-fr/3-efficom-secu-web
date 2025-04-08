@@ -16,7 +16,8 @@ const login = (req, res, next) => {
         email: user.email,
         token: jwt.sign({
             id: user.id,
-            email: user.email
+            email: user.email,
+            roles: user.roles
         }, process.env.JWT_KEY)
     });
 }
