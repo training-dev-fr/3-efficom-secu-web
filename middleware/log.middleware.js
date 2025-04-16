@@ -2,19 +2,24 @@ const fs = require('fs');
 const LOG_FILE = './log/req.log';
 
 const log = (req, res, next) => {
-    let logString = [(new Date()).toLocaleString()]
-    logString.push(req.method);
-    logString.push(req.path);
-    logString.push(req.ip);
-    logString.push("\n Content-Type:", req.headers["content-type"]);
-    if (req.body) {
-        if(!req.body.password){
-            logString.push("\n", JSON.stringify(req.body));
-        }else{
-            logString.push("\n", JSON.stringify({...req.body,password: "********"}));
+    let status = res.status;
+    res.status = (code) => {
+        let logString = [(new Date()).toLocaleString()]
+        logString.push(req.method);
+        logString.push(req.path);
+        logString.push(req.ip);
+        logString.push("\n Content-Type:", req.headers["content-type"]);
+        if (req.body) {
+            if(!req.body.password){
+                logString.push("\n", JSON.stringify(req.body));
+            }else{
+                logString.push("\n", JSON.stringify({...req.body,password: "********"}));
+            }
         }
+        logString.push(code);
+        fs.appendFileSync(LOG_FILE,logString.join(" ") + "\n");
+        status(code);
     }
-    fs.appendFileSync(LOG_FILE,logString.join(" ") + "\n");
     next();
 }
 

@@ -1,12 +1,13 @@
-let orm = require('./../framework/orm.js');
+const {bdd} = require('./../framework/connection.js');
+const {DataTypes} = require('sequelize');
 
-let User = orm.define('user',{
+let User = bdd.define('user',{
     email: {
-        type: "string",
+        type: DataTypes.STRING(255),
         unique: true
     },
     password: {
-        type: "string"
+        type: DataTypes.STRING(255)
     }
 });
 
