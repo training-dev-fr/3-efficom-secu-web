@@ -1,4 +1,4 @@
-const User = require('./../model/user.model.js');
+const User = require('./../model/user.schema.js');
 const Role = require('./../model/role.model.js');
 const bcrypt = require('bcrypt');
 
@@ -7,22 +7,35 @@ const getAll = (req, res, next) => {
     res.status(200).json(result);
 }
 
-const getById = (req, res, next) => {
-    let result = User.getById(req.params.id);
+// const getById = (req, res, next) => {
+//     let result = User.getById(req.params.id);
+//     res.status(200).json(result);
+// }
+
+const getById = async (req, res, next) => {
+    let result = await User.findOne({
+        where: {
+            id: req.params.id
+        }
+    });
     res.status(200).json(result);
 }
 
-const create = (req, res, next) => {
+const create = async (req, res, next) => {
     let member = Role.getByName("Member");
-    if(!member){
-        return res.status(404).json({message: "Le rôle Member n'as pas été trouvé"});
+    if (!member) {
+        return res.status(404).json({ message: "Le rôle Member n'as pas été trouvé" });
     }
-    let result = User.create({
-        email: req.body.email,
-        password: bcrypt.hashSync(req.body.password, 10),
-        roles: [member.id]
-    });
-    res.status(201).json(result);
+    try {
+        let result = await User.create({
+            email: req.body.email,
+            password: bcrypt.hashSync(req.body.password, 10),
+            roles: [member.id]
+        });
+        res.status(201).json(result);
+    } catch (e) {
+        res.status(400).json({ error: e.message });
+    }
 }
 
 const update = (req, res, next) => {
@@ -38,7 +51,7 @@ const remove = (req, res, next) => {
 const addRole = (req, res, next) => {
     try {
         User.addRole(req.params.userId, req.params.roleId);
-        return res.status(201).json({message: "Le rôle a bien été ajouté à l'utilisateur"});
+        return res.status(201).json({ message: "Le rôle a bien été ajouté à l'utilisateur" });
     } catch (e) {
         return res.status(404).json(e.message);
     }
@@ -47,7 +60,7 @@ const addRole = (req, res, next) => {
 const removeRole = (req, res, next) => {
     try {
         User.removeRole(req.params.userId, req.params.roleId);
-        return res.status(201).json({message: "Le rôle a bien été retiré de l'utilisateur"});
+        return res.status(201).json({ message: "Le rôle a bien été retiré de l'utilisateur" });
     } catch (e) {
         return res.status(404).json(e.message);
     }

@@ -13,7 +13,6 @@ const log = (req, res, next) => {
         }else{
             logString.push("\n", JSON.stringify({...req.body,password: "********"}));
         }
-       
     }
     fs.appendFileSync(LOG_FILE,logString.join(" ") + "\n");
     next();
